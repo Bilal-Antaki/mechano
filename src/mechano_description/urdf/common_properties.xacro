@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Robot dimensions -->
+  <xacro:property name="base_length" value="0.30"/>
+  <xacro:property name="base_width" value="0.25"/>
+  <xacro:property name="base_height" value="0.10"/>
+
+  <xacro:property name="wheel_radius" value="0.05"/>
+  <xacro:property name="wheel_width" value="0.03"/>
+  <xacro:property name="wheel_separation" value="0.30"/>
+
+  <xacro:property name="caster_radius" value="0.02"/>
+
+  <!-- Masses -->
+  <xacro:property name="base_mass" value="5.0"/>
+  <xacro:property name="wheel_mass" value="0.5"/>
+  <xacro:property name="caster_mass" value="0.1"/>
+
+  <!-- Inertia macro for box -->
+  <xacro:macro name="box_inertia" params="m x y z">
+    <inertia
+      ixx="${(1/12) * m * (y*y + z*z)}"
+      ixy="0.0"
+      ixz="0.0"
+      iyy="${(1/12) * m * (x*x + z*z)}"
+      iyz="0.0"
+      izz="${(1/12) * m * (x*x + y*y)}"/>
+  </xacro:macro>
+
+  <!-- Inertia macro for cylinder -->
+  <xacro:macro name="cylinder_inertia" params="m r h">
+    <inertia
+      ixx="${(1/12) * m * (3*r*r + h*h)}"
+      ixy="0.0"
+      ixz="0.0"
+      iyy="${(1/12) * m * (3*r*r + h*h)}"
+      iyz="0.0"
+      izz="${(1/2) * m * r*r}"/>
+  </xacro:macro>
+
+  <!-- Inertia macro for sphere -->
+  <xacro:macro name="sphere_inertia" params="m r">
+    <inertia
+      ixx="${(2/5) * m * r*r}"
+      ixy="0.0"
+      ixz="0.0"
+      iyy="${(2/5) * m * r*r}"
+      iyz="0.0"
+      izz="${(2/5) * m * r*r}"/>
+  </xacro:macro>
+
+</robot>

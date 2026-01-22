@@ -1,0 +1,18 @@
+# Joint limits configuration
+
+joint_limits:
+  left_wheel_joint:
+    has_velocity_limits: true
+    max_velocity: 10.0  # rad/s
+    has_acceleration_limits: true
+    max_acceleration: 5.0  # rad/s^2
+    has_effort_limits: true
+    max_effort: 10.0  # Nm
+
+  right_wheel_joint:
+    has_velocity_limits: true
+    max_velocity: 10.0  # rad/s
+    has_acceleration_limits: true
+    max_acceleration: 5.0  # rad/s^2
+    has_effort_limits: true
+    max_effort: 10.0  # Nm

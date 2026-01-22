@@ -1,0 +1,6 @@
+# Placeholder for custom Gazebo models
+# Add model directories here following Gazebo model format:
+# model_name/
+#   model.config
+#   model.sdf
+#   meshes/

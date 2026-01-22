@@ -1,0 +1,24 @@
+# Mechano node configuration
+
+mechano_node:
+  ros__parameters:
+    # Battery thresholds (percentage)
+    battery:
+      low_threshold: 20.0
+      critical_threshold: 10.0
+
+    # Safety parameters
+    safety:
+      min_distance: 0.2  # meters
+
+    # Button functions
+    buttons:
+      button_1: "toggle_mode"
+      button_2: "estop"
+      button_3: "horn"
+
+    # LED patterns (ms)
+    led:
+      blink_slow_period: 1000
+      blink_fast_period: 250
+      pulse_period: 2000

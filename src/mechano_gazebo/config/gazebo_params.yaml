@@ -1,0 +1,8 @@
+# Gazebo simulation parameters
+
+gazebo:
+  ros__parameters:
+    publish_rate: 100.0
+
+# Physics settings applied via world file
+# For programmatic changes, use Gazebo services

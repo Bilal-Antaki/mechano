@@ -1,0 +1,27 @@
+# Stereo camera driver parameters
+# Adjust based on your specific camera (OAK-D, RealSense, etc.)
+
+camera:
+  ros__parameters:
+    # General
+    camera_name: "camera"
+    frame_id: "camera_link"
+
+    # Resolution and framerate
+    rgb_resolution: "1080p"
+    depth_resolution: "400p"
+    fps: 30
+
+    # Depth settings
+    depth_align: true
+    enable_depth: true
+    enable_rgb: true
+    enable_ir: false
+
+    # Exposure
+    auto_exposure: true
+    exposure_time_us: 10000
+
+    # Quality
+    depth_confidence_threshold: 200
+    lrc_threshold: 5

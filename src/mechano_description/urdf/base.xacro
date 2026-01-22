@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Base link macro -->
+  <xacro:macro name="base_link">
+
+    <!-- Base footprint - on the ground plane -->
+    <link name="base_footprint"/>
+
+    <!-- Base link - center of robot body -->
+    <link name="base_link">
+      <visual>
+        <geometry>
+          <box size="${base_length} ${base_width} ${base_height}"/>
+        </geometry>
+        <material name="blue"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${base_length} ${base_width} ${base_height}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${base_mass}"/>
+        <xacro:box_inertia m="${base_mass}" x="${base_length}" y="${base_width}" z="${base_height}"/>
+      </inertial>
+    </link>
+
+    <!-- Joint from footprint to base_link -->
+    <joint name="base_footprint_joint" type="fixed">
+      <parent link="base_footprint"/>
+      <child link="base_link"/>
+      <origin xyz="0 0 ${wheel_radius + base_height/2}" rpy="0 0 0"/>
+    </joint>
+
+    <!-- Gazebo material for base -->
+    <gazebo reference="base_link">
+      <material>Gazebo/Blue</material>
+    </gazebo>
+
+  </xacro:macro>
+
+  <!-- Caster wheel macro -->
+  <xacro:macro name="caster_wheel">
+
+    <link name="caster_link">
+      <visual>
+        <geometry>
+          <sphere radius="${caster_radius}"/>
+        </geometry>
+        <material name="dark_grey"/>
+      </visual>
+      <collision>
+        <geometry>
+          <sphere radius="${caster_radius}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${caster_mass}"/>
+        <xacro:sphere_inertia m="${caster_mass}" r="${caster_radius}"/>
+      </inertial>
+    </link>
+
+    <joint name="caster_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="caster_link"/>
+      <origin xyz="${-base_length/2 + caster_radius} 0 ${-base_height/2 - wheel_radius + caster_radius}" rpy="0 0 0"/>
+    </joint>
+
+    <!-- Gazebo friction for caster (low friction for smooth rolling) -->
+    <gazebo reference="caster_link">
+      <material>Gazebo/Grey</material>
+      <mu1>0.001</mu1>
+      <mu2>0.001</mu2>
+    </gazebo>
+
+  </xacro:macro>
+
+</robot>

@@ -1,0 +1,19 @@
+# General robot parameters
+
+robot:
+  ros__parameters:
+    # Physical parameters
+    wheel_radius: 0.05  # meters
+    wheel_separation: 0.30  # meters
+    wheel_base: 0.20  # meters (front to back)
+
+    # Limits
+    max_linear_velocity: 0.5  # m/s
+    max_angular_velocity: 1.5  # rad/s
+    max_linear_acceleration: 1.0  # m/s^2
+    max_angular_acceleration: 2.0  # rad/s^2
+
+    # Frame IDs
+    base_frame: base_footprint
+    odom_frame: odom
+    map_frame: map

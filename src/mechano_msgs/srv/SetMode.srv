@@ -1,0 +1,11 @@
+# Set robot operating mode
+
+# Request
+uint8 MODE_IDLE = 0
+uint8 MODE_TELEOP = 1
+uint8 MODE_AUTONOMOUS = 2
+uint8 mode
+---
+# Response
+bool success
+string message

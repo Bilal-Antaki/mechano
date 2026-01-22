@@ -1,0 +1,14 @@
+# depthimage_to_laserscan parameters
+
+depthimage_to_laserscan:
+  ros__parameters:
+    # Scan parameters
+    scan_height: 10  # Number of pixel rows to use
+    scan_time: 0.033  # Time between scans (1/fps)
+    range_min: 0.1  # Minimum range (meters)
+    range_max: 10.0  # Maximum range (meters)
+
+    # Frame
+    output_frame_id: "camera_depth_frame"
+
+    # Topic remapping done in launch file

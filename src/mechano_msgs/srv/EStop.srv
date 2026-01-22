@@ -1,0 +1,8 @@
+# Emergency stop service
+
+# Request
+bool activate  # true to activate E-stop, false to release
+---
+# Response
+bool success
+string message

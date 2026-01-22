@@ -1,0 +1,10 @@
+<library path="mechano_hardware">
+  <class name="mechano_hardware/MechanoSystemHardware"
+         type="mechano_hardware::MechanoSystemHardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Hardware interface for the Mechano differential drive robot.
+      Communicates with an Arduino microcontroller via serial.
+    </description>
+  </class>
+</library>

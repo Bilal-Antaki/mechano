@@ -1,0 +1,5 @@
+# Placeholder for mesh files
+# Add STL or DAE mesh files here:
+# - base_link.stl
+# - wheel.stl
+# - camera.stl
