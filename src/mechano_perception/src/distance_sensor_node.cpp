@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <functional>
+#include <stdexcept>
 
 using namespace std::chrono_literals;
 
@@ -11,7 +12,8 @@ namespace mechano_perception
 DistanceSensorNode::DistanceSensorNode(const rclcpp::NodeOptions & options)
 : Node("distance_sensor_node", options),
   fd_(-1),
-  connected_(false)
+  connected_(false),
+  dummy_distance_(1.0)
 {
   // Declare parameters
   this->declare_parameter("frame_id", "distance_sensor_link");
@@ -32,7 +34,10 @@ DistanceSensorNode::DistanceSensorNode(const rclcpp::NodeOptions & options)
   // Create publisher
   publisher_ = this->create_publisher<sensor_msgs::msg::Range>("distance", 10);
 
-  // Create timer
+  if (publish_rate_ <= 0) {
+    RCLCPP_ERROR(this->get_logger(), "publish_rate must be > 0, got %d", publish_rate_);
+    throw std::invalid_argument("publish_rate must be > 0");
+  }
   auto period = std::chrono::milliseconds(1000 / publish_rate_);
   timer_ = this->create_wall_timer(period, std::bind(&DistanceSensorNode::timer_callback, this));
 
@@ -62,21 +67,12 @@ void DistanceSensorNode::timer_callback()
 
 double DistanceSensorNode::read_distance()
 {
-  // Placeholder implementation
-  // In a real implementation, this would read from the actual sensor
-  // For example, VL53L0X via I2C or serial
-
-  // Return a dummy value for now
-  // This should be replaced with actual sensor reading code
-  static double dummy_distance = 1.0;
-
-  // Simulate some variation
-  dummy_distance += 0.01;
-  if (dummy_distance > max_range_) {
-    dummy_distance = min_range_;
+  // Placeholder — replace with actual sensor (e.g. VL53L0X via I2C/serial)
+  dummy_distance_ += 0.01;
+  if (dummy_distance_ > max_range_) {
+    dummy_distance_ = min_range_;
   }
-
-  return dummy_distance;
+  return dummy_distance_;
 }
 
 }  // namespace mechano_perception

@@ -45,6 +45,8 @@ def generate_launch_description():
         condition=UnlessCondition(LaunchConfiguration('use_sim'))
     )
 
+    use_sim_time = LaunchConfiguration('use_sim')
+
     # EKF for sensor fusion
     ekf_config = PathJoinSubstitution([bringup_pkg, 'config', 'ekf.yaml'])
     ekf_node = Node(
@@ -52,7 +54,7 @@ def generate_launch_description():
         executable='ekf_node',
         name='ekf_filter_node',
         output='screen',
-        parameters=[ekf_config],
+        parameters=[ekf_config, {'use_sim_time': use_sim_time}],
         remappings=[
             ('odometry/filtered', 'odom')
         ]
@@ -65,7 +67,7 @@ def generate_launch_description():
         executable='twist_mux',
         name='twist_mux',
         output='screen',
-        parameters=[twist_mux_config],
+        parameters=[twist_mux_config, {'use_sim_time': use_sim_time}],
         remappings=[
             ('cmd_vel_out', 'diff_drive_controller/cmd_vel_unstamped')
         ]

@@ -1,5 +1,7 @@
 #include "mechano_node/battery_monitor.hpp"
 
+#include <algorithm>
+
 namespace mechano_node
 {
 
@@ -29,7 +31,8 @@ BatteryMonitor::BatteryMonitor(rclcpp::Node * node)
 void BatteryMonitor::battery_callback(const sensor_msgs::msg::BatteryState::SharedPtr msg)
 {
   voltage_ = msg->voltage;
-  percentage_ = msg->percentage * 100.0;  // Convert to percentage
+  // BatteryState.percentage is 0.0-1.0; clamp result to [0, 100] to guard against bad publishers
+  percentage_ = std::min(100.0f, std::max(0.0f, msg->percentage * 100.0f));
 }
 
 float BatteryMonitor::get_percentage() const

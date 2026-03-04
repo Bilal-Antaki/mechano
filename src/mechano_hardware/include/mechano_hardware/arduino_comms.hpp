@@ -17,7 +17,7 @@ public:
   void disconnect();
   bool is_connected() const;
 
-  void read_encoder_values(int & left_enc, int & right_enc);
+  bool read_encoder_values(int & left_enc, int & right_enc);
   void set_motor_values(double left_vel, double right_vel);
 
 private:

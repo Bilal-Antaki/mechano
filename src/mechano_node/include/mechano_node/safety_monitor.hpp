@@ -5,7 +5,6 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/range.hpp"
-#include "geometry_msgs/msg/twist.hpp"
 
 namespace mechano_node
 {
@@ -23,12 +22,9 @@ public:
 
 private:
   void range_callback(const sensor_msgs::msg::Range::SharedPtr msg);
-  void cmd_vel_callback(const geometry_msgs::msg::Twist::SharedPtr msg);
 
   rclcpp::Node * node_;
   rclcpp::Subscription<sensor_msgs::msg::Range>::SharedPtr range_subscription_;
-  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_subscription_;
-  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_publisher_;
 
   EStopCallback estop_callback_;
 

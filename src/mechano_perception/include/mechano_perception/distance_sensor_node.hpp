@@ -33,6 +33,8 @@ private:
   int fd_;
   bool connected_;
 
+  double dummy_distance_;  // placeholder state for read_distance stub
+
   double read_distance();
 };
 

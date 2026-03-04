@@ -74,12 +74,14 @@ void MechanoNode::timer_callback()
   msg.error_code = 0;
   msg.error_message = "";
 
-  // Check for low battery
+  // Battery alerts — only update LED if E-Stop is not active (E-Stop LED takes priority)
   if (battery_monitor_->is_critical()) {
     msg.error_code = 1;
     msg.error_message = "Critical battery level";
-    hmi_->set_led(LedColor::RED, LedPattern::BLINK_FAST);
-  } else if (battery_monitor_->is_low()) {
+    if (!estop_active_) {
+      hmi_->set_led(LedColor::RED, LedPattern::BLINK_FAST);
+    }
+  } else if (battery_monitor_->is_low() && !estop_active_) {
     hmi_->set_led(LedColor::YELLOW, LedPattern::BLINK_SLOW);
   }
 

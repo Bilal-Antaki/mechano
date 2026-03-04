@@ -3,6 +3,8 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
+#include <algorithm>
+#include <cstdio>
 #include <cstring>
 #include <sstream>
 #include <stdexcept>
@@ -64,9 +66,9 @@ bool ArduinoComms::connect()
   // Raw output
   tty.c_oflag &= ~OPOST;
 
-  // Read timeout
+  // VTIME is in tenths of a second; clamp to at least 1 to avoid non-blocking mode
   tty.c_cc[VMIN] = 0;
-  tty.c_cc[VTIME] = timeout_ms_ / 100;
+  tty.c_cc[VTIME] = static_cast<cc_t>(std::max(1, timeout_ms_ / 100));
 
   if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
     close(fd_);
@@ -99,7 +101,12 @@ void ArduinoComms::send_command(const std::string & cmd)
   }
 
   std::string full_cmd = cmd + "\n";
-  write(fd_, full_cmd.c_str(), full_cmd.length());
+  ssize_t written = write(fd_, full_cmd.c_str(), full_cmd.size());
+  if (written < 0 || static_cast<size_t>(written) != full_cmd.size()) {
+    close(fd_);
+    fd_ = -1;
+    connected_ = false;
+  }
 }
 
 std::string ArduinoComms::read_response()
@@ -110,54 +117,46 @@ std::string ArduinoComms::read_response()
 
   char buf[256];
   std::string response;
+  response.reserve(64);
 
   while (true) {
     int n = read(fd_, buf, sizeof(buf) - 1);
     if (n <= 0) {
       break;
     }
-    buf[n] = '\0';
-    response += buf;
+    response.append(buf, n);
 
     if (response.find('\n') != std::string::npos) {
       break;
     }
   }
 
-  // Remove trailing newline
-  if (!response.empty() && response.back() == '\n') {
-    response.pop_back();
-  }
-  if (!response.empty() && response.back() == '\r') {
+  // Strip trailing CR/LF
+  while (!response.empty() &&
+    (response.back() == '\n' || response.back() == '\r'))
+  {
     response.pop_back();
   }
 
   return response;
 }
 
-void ArduinoComms::read_encoder_values(int & left_enc, int & right_enc)
+bool ArduinoComms::read_encoder_values(int & left_enc, int & right_enc)
 {
-  // Send encoder request
   send_command("e");
 
-  // Read response
-  std::string response = read_response();
-
-  // Parse response: "left_enc right_enc"
-  std::istringstream iss(response);
+  std::istringstream iss(read_response());
   if (!(iss >> left_enc >> right_enc)) {
-    // Parse failed, keep previous values
-    left_enc = 0;
-    right_enc = 0;
+    return false;  // caller keeps previous values
   }
+  return true;
 }
 
 void ArduinoComms::set_motor_values(double left_vel, double right_vel)
 {
-  // Send velocity command: "v left_vel right_vel"
-  std::ostringstream oss;
-  oss << "v " << left_vel << " " << right_vel;
-  send_command(oss.str());
+  char buf[64];
+  std::snprintf(buf, sizeof(buf), "v %.6f %.6f", left_vel, right_vel);
+  send_command(buf);
 }
 
 }  // namespace mechano_hardware

@@ -45,12 +45,6 @@ void SafetyMonitor::range_callback(const sensor_msgs::msg::Range::SharedPtr msg)
   }
 }
 
-void SafetyMonitor::cmd_vel_callback(const geometry_msgs::msg::Twist::SharedPtr msg)
-{
-  (void)msg;  // Unused for now
-  // Could be used to monitor velocity for safety checks
-}
-
 bool SafetyMonitor::is_obstacle_detected() const
 {
   return obstacle_detected_;

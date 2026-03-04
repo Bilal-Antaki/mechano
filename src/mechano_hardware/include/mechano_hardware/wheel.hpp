@@ -36,8 +36,11 @@ public:
     enc_counts_per_rev = counts_per_rev;
   }
 
-  double calc_enc_angle()
+  double calc_enc_angle() const
   {
+    if (enc_counts_per_rev == 0) {
+      return 0.0;
+    }
     return static_cast<double>(enc) / enc_counts_per_rev * 2.0 * M_PI;
   }
 };

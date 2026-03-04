@@ -1,6 +1,7 @@
 #ifndef MECHANO_NODE__MECHANO_NODE_HPP_
 #define MECHANO_NODE__MECHANO_NODE_HPP_
 
+#include <atomic>
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
@@ -44,9 +45,9 @@ private:
   std::unique_ptr<BatteryMonitor> battery_monitor_;
   std::unique_ptr<SafetyMonitor> safety_monitor_;
 
-  // State
-  uint8_t current_mode_;
-  bool estop_active_;
+  // State — atomic for safe access from timer and service callbacks
+  std::atomic<uint8_t> current_mode_;
+  std::atomic<bool> estop_active_;
 };
 
 }  // namespace mechano_node

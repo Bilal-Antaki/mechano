@@ -22,15 +22,33 @@ hardware_interface::CallbackReturn MechanoSystemHardware::on_init(
     return hardware_interface::CallbackReturn::ERROR;
   }
 
-  // Get parameters from URDF
-  device_ = info_.hardware_parameters["device"];
-  baud_rate_ = std::stoi(info_.hardware_parameters["baud_rate"]);
-  timeout_ms_ = std::stoi(info_.hardware_parameters["timeout_ms"]);
-  enc_counts_per_rev_ = std::stoi(info_.hardware_parameters["enc_counts_per_rev"]);
+  // Get parameters from URDF — use .at() and catch so missing params return ERROR, not throw
+  try {
+    device_ = info_.hardware_parameters.at("device");
+    baud_rate_ = std::stoi(info_.hardware_parameters.at("baud_rate"));
+    timeout_ms_ = std::stoi(info_.hardware_parameters.at("timeout_ms"));
+    enc_counts_per_rev_ = std::stoi(info_.hardware_parameters.at("enc_counts_per_rev"));
+  } catch (const std::exception & e) {
+    RCLCPP_ERROR(
+      rclcpp::get_logger("MechanoSystemHardware"),
+      "Missing or invalid hardware parameter: %s", e.what());
+    return hardware_interface::CallbackReturn::ERROR;
+  }
 
-  // Setup wheels
-  left_wheel_.setup(info_.joints[0].name, enc_counts_per_rev_);
-  right_wheel_.setup(info_.joints[1].name, enc_counts_per_rev_);
+  // Find wheels by name to avoid assuming joint ordering in the URDF
+  for (const auto & joint : info_.joints) {
+    if (joint.name.find("left") != std::string::npos) {
+      left_wheel_.setup(joint.name, enc_counts_per_rev_);
+    } else if (joint.name.find("right") != std::string::npos) {
+      right_wheel_.setup(joint.name, enc_counts_per_rev_);
+    }
+  }
+  if (left_wheel_.name.empty() || right_wheel_.name.empty()) {
+    RCLCPP_ERROR(
+      rclcpp::get_logger("MechanoSystemHardware"),
+      "Could not find left and right wheel joints in URDF");
+    return hardware_interface::CallbackReturn::ERROR;
+  }
 
   RCLCPP_INFO(
     rclcpp::get_logger("MechanoSystemHardware"),
@@ -137,11 +155,16 @@ hardware_interface::return_type MechanoSystemHardware::read(
     return hardware_interface::return_type::ERROR;
   }
 
-  // Read encoder values
-  int left_enc, right_enc;
-  comms_.read_encoder_values(left_enc, right_enc);
+  // Start from previous encoder values; read_encoder_values only updates them on success
+  int left_enc = left_wheel_.enc;
+  int right_enc = right_wheel_.enc;
 
-  // Calculate velocity from encoder change
+  if (!comms_.read_encoder_values(left_enc, right_enc)) {
+    RCLCPP_WARN(
+      rclcpp::get_logger("MechanoSystemHardware"), "Encoder read failed, keeping previous values");
+    return hardware_interface::return_type::OK;
+  }
+
   double delta_seconds = period.seconds();
   if (delta_seconds > 0) {
     int left_delta = left_enc - left_wheel_.enc;
@@ -153,11 +176,8 @@ hardware_interface::return_type MechanoSystemHardware::read(
       delta_seconds;
   }
 
-  // Update encoder values
   left_wheel_.enc = left_enc;
   right_wheel_.enc = right_enc;
-
-  // Update positions
   left_wheel_.pos = left_wheel_.calc_enc_angle();
   right_wheel_.pos = right_wheel_.calc_enc_angle();
 
